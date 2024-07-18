@@ -1,0 +1,37 @@
+import openai  
+import click  
+import sys 
+
+def summarize_text(text):
+    openai.api_key = "YOUR_OLLAMA_API_KEY"
+
+    model = "qwen-0.5b"
+    temperature = 0.7  
+    max_tokens = 256  
+
+    prompt = f"Summarize the following text: {text}"
+
+    response = openai.Completion.create(
+        engine=model,
+        prompt=prompt,
+        max_tokens=max_tokens,
+        temperature=temperature
+    )
+
+    return response.choices[0].text.strip()
+
+@click.command()
+@click.argument('text_file', type=click.Path(exists=True), required=False)
+def summarize(text_file):
+   
+    if text_file:
+        with open(text_file, 'r') as f:
+            text = f.read()
+    else:
+        text = sys.stdin.read()
+
+    summary = summarize_text(text)
+    print(summary)
+
+if __name__ == '__main__':
+    summarize()
